@@ -7,42 +7,49 @@
 # index.html
 
 ### Overview
-This file serves as the main entry point for the Lecture Summarizer user interface. It defines the structure and static content of the web page, including navigation, interactive forms for input selection and export, and placeholders for dynamic content like chat messages.
+This file serves as the main entry point for the client-side user interface of the AI-Powered Lecture Summarizer application. It defines the structural layout, static content, and integrates client-side styling and scripting to provide interactive functionality.
 
 ### Architecture & Role
-Architecturally, `index.html` functions as the presentation layer on the client-side. It is the root document that the web browser loads, orchestrating the inclusion of stylesheets, video assets, and client-side JavaScript logic to render the complete user interface. It belongs to the frontend component of the system.
+Architecturally, `index.html` resides at the presentation layer of the application. It is the root document loaded by a web browser, rendering the initial user interface. Its role is to structure the UI elements, link necessary stylesheets and client-side scripts, and display static text and multimedia assets.
 
 ### Key Components
-*   **`head` section**: Configures document metadata, character set, viewport, title, and links external resources like Google Fonts and `style.css`.
-*   **`video-container`**: A `div` element that holds a `video` tag configured for an autoplaying, muted, and looping background video (`videos/desktop-video.mp4`).
-*   **`container`**: The main content wrapper, housing the application header, suggestions list, chat area, and prompt/control panel.
-*   **`app-header`**: Contains the main title and sub-heading for the application.
-*   **`suggestions` list**: An unordered list (`ul`) presenting key features with descriptive text and corresponding Material Symbols icons.
-*   **`chats-container`**: An empty `div` intended to dynamically display chat or summary content.
-*   **`prompt-container`**: Encapsulates user interaction elements:
-    *   **`prompt-form`**: A `form` containing `select` elements for input type (`mic`, `file`, `youtube`) and export format (`pdf`, `word`, `json`), `input` fields for YouTube URLs and file uploads, and a `process-btn` to initiate actions.
-    *   **`theme-toggle-btn`**: A button to switch themes.
-    *   **`delete-chats-btn`**: A button to clear chat content.
-*   **`script.js`**: An external JavaScript file linked at the end of the `body`, responsible for client-side interactivity and application logic.
+*   **HTML Structure**: Defines the overall page layout, including a header, feature suggestions, a chat area placeholder, and input controls.
+*   **Video Background**: A `<video>` element (`desktop-video.mp4`) provides an autoplaying, muted, and looping background.
+*   **Application Header**: Displays the main title ("AI-Powered Lecture Summarizer") and a subtitle describing its functionality.
+*   **Feature Suggestions**: A `<ul>` list outlines key features: real-time mic summary, file upload, YouTube link pasting, and summary export options.
+*   **Input Controls**: A `<form>` element containing:
+    *   `select#input-type`: Dropdown for selecting input source (Mic, File, YouTube).
+    *   `input#youtube-link`: Text input for YouTube URLs (initially hidden).
+    *   `input#audio-file`: File input for audio/video uploads (initially hidden).
+    *   `select#export-format`: Dropdown for selecting summary export format (PDF, Word, JSON).
+    *   `button#process-btn`: Initiates the summary process.
+*   **Utility Buttons**: `button#theme-toggle-btn` for UI theme control and `button#delete-chats-btn` for clearing conversations.
+*   **Disclaimers**: Informative text regarding the demo's in-browser functionality and limited AI logic.
 
 ### Execution Flow / Behavior
-Upon loading in a web browser, `index.html` renders the initial user interface. It displays a background video, the application header, and a list of suggested actions. The form elements within `prompt-container` are initially rendered, with certain input fields (`youtube-link`, `audio-file`) hidden by default. The file primarily defines the static layout and controls; dynamic behavior, such as toggling input fields based on `input-type` selection, processing user requests, or populating the `chats-container`, is managed by the associated `script.js` file.
+When `index.html` is loaded by a browser, the following occurs:
+1.  The HTML document structure is parsed and rendered.
+2.  The external stylesheet (`style.css`) is fetched and applied for visual styling.
+3.  The Material Symbols Rounded font is loaded from Google Fonts for iconography.
+4.  The background video (`videos/desktop-video.mp4`) begins playback.
+5.  The interactive elements, such as input selectors and buttons, are displayed according to their initial state.
+6.  The `script.js` file is loaded and executed, enabling dynamic behaviors like toggling input fields based on `input-type` selection, handling form submissions, and managing theme/chat deletion actions.
 
 ### Dependencies
-*   **`style.css`**: Provides the cascading style rules for the visual presentation of the HTML elements.
-*   **`https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:...`**: External stylesheet from Google Fonts, providing the Material Symbols icons used throughout the UI.
-*   **`videos/desktop-video.mp4`**: A local video file used as a looping background element.
-*   **`script.js`**: A local JavaScript file that provides the interactive logic for the forms, buttons, and potentially dynamic content updates within the page.
+*   **Internal Stylesheet**: `style.css` provides the visual styling for all HTML elements.
+*   **Internal Script**: `script.js` provides the client-side interactivity and logic for the UI components.
+*   **External Font**: `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded` for displaying icons.
+*   **Local Video Asset**: `videos/desktop-video.mp4` for the animated background.
 
 ### Design Notes
-The structure suggests a single-page application (SPA) design, where `index.html` provides the shell and `script.js` handles most of the interactive and dynamic content rendering. The presence of hidden input fields and a `select` element for input type implies dynamic form field visibility controlled by JavaScript. The disclaimer about "fully in-browser with limited AI logic" indicates this HTML is part of a client-side demo or prototype, with core AI processing likely deferred to a backend or a limited client-side implementation within `script.js`.
+The design leverages a single HTML file for the entire application interface, indicating a single-page application (SPA) approach, although without a framework. Conditional display of input fields (`youtube-link`, `audio-file`) using `style="display:none;"` suggests these elements are dynamically managed by `script.js` to show/hide based on user selection. The use of semantic HTML elements and clear class naming improves readability and maintainability. The disclaimer highlights the client-side nature and potentially limited backend interaction of this specific demo.
 
 ### Diagram
 ```mermaid
 graph TD
-BrowserRequest --> IndexHTML
-IndexHTML --> StyleCSS
-IndexHTML --> GoogleFontsCSS
-IndexHTML --> VideoMP4
-IndexHTML --> ScriptJS
+ClientBrowser[ClientBrowser] --> IndexHTML[index.html]
+IndexHTML --> StyleCSS[style.css]
+IndexHTML --> ScriptJS[script.js]
+IndexHTML --> VideoMP4[videos/desktop-video.mp4]
+IndexHTML --> GoogleFonts[GoogleFontsCDN]
 ```
