@@ -1,65 +1,64 @@
 # script.js
 
-> **Source File:** [script.js](https://github.com/Note-Summerizer/blob/main/script.js)  
-> **Repository:** `Note-Summerizer`  
+> **Source File:** [script.js](https://github.com/test-company-prowiz/Note-Summerizer/blob/main/script.js)
+> **Repository:** `Note-Summerizer`
 > **Branch:** `main`
 
+# script.js
+
 ### Overview
-This file implements the client-side logic for a web application that interacts with a backend summarization service. It handles user input for specifying input type (YouTube URL or file upload), submitting requests to the backend, displaying processing feedback, and presenting the summarization results in a chat-like interface. It also manages UI elements like theme toggling and clearing chat history.
+This file implements the client-side logic for a content summarization application. It manages user interface interactions, handles form submissions for summarization requests (via YouTube URL, audio file, or microphone), communicates with a backend API, and displays the processed results in a chat-like format. It also includes UI features such as theme toggling and clearing chat history.
 
 ### Architecture & Role
-This JavaScript file functions as a core component of the frontend client. It operates within the browser's execution environment, managing the user interface, capturing user interactions, and orchestrating asynchronous communication with a dedicated backend API. It sits at the presentation layer, bridging user actions with data processing performed by the backend.
+This file operates as the primary client-side component within a client-server architecture. It resides in the presentation layer, directly interacting with the Document Object Model (DOM) to render the user interface and capture user input. Its main role is to facilitate user interaction and forward summarization requests to the designated backend service.
 
 ### Key Components
-*   **`chatsContainer`**: A DOM element that serves as the display area for chat-style messages, including user prompts, processing statuses, and backend summaries.
-*   **`promptForm`**: The main HTML form responsible for capturing user input for summarization requests.
-*   **`inputType`**: A select element that controls whether a YouTube URL input or a file upload input is displayed and determines the type of data sent to the backend.
-*   **`youtubeInput`**: An input field for users to provide a YouTube video URL for summarization.
-*   **`fileInput`**: An input field for users to upload an audio file for summarization.
-*   **`themeToggleBtn`**: A button that allows users to switch between light and dark themes, with the preference stored in `localStorage`.
-*   **`deleteChatsBtn`**: A button that clears all displayed messages from the `chatsContainer`.
-*   **`BACKEND_URL`**: A constant defining the API endpoint for the summarization service (`http://127.0.0.1:5000/summarize`).
-*   **`showResultBlock(title, content, type)`**: A utility function to create and append a new message block to the `chatsContainer`, styling it based on the `type` parameter.
+*   **`showResultBlock(title, content, type)`**: A utility function responsible for dynamically creating and appending message blocks to the chat container, displaying prompts, processing statuses, errors, or summarization results.
+*   **`promptForm` Event Listener**: Manages the form submission process. It extracts user input, performs client-side validation, constructs `FormData`, dispatches asynchronous `POST` requests to the backend, and handles displaying responses or errors.
+*   **`inputType` Change Listener**: Controls the visibility of input fields (YouTube link or file upload) based on the user's selected input type, ensuring a dynamic user experience.
+*   **`themeToggleBtn` Click Listener**: Toggles the application's visual theme (light/dark mode) by manipulating CSS classes on the `body` element and persisting the preference in `localStorage`.
+*   **`deleteChatsBtn` Click Listener**: Clears all displayed chat messages from the `chatsContainer` and resets the UI state.
 
 ### Execution Flow / Behavior
-Upon loading, the script initializes by selecting various DOM elements.
-*   **Input Type Toggle**: An event listener on `inputType` dynamically shows or hides the `youtubeInput` or `fileInput` field based on the selected input type.
-*   **Form Submission**: When `promptForm` is submitted:
-    *   It prevents the default form submission.
-    *   The `chatsContainer` is cleared.
-    *   Input values (selected type, format, YouTube URL, or file) are validated.
-    *   A `FormData` object is constructed, including the input type, export format, and either the YouTube URL, the uploaded file, or a placeholder duration for a "mic" input (though "mic" input handling isn't fully implemented).
-    *   A "Processing Input..." message is displayed.
-    *   An asynchronous POST request is sent to `BACKEND_URL` with the `FormData`.
-    *   Upon receiving a response:
-        *   The "Processing" message is cleared.
-        *   If the response contains an `error` field, an error message is displayed.
-        *   Otherwise, the overall summary, overview, key points, and output file name from the backend response are displayed as distinct chat blocks.
-        *   Network or server errors during the fetch operation are caught and displayed as "Server Error" messages.
-*   **Theme Toggle**: Clicking `themeToggleBtn` toggles the `light-theme` class on the `document.body` and updates `localStorage` to persist the user's theme preference. The button's text also changes to reflect the current theme.
-*   **Delete Chats**: Clicking `deleteChatsBtn` clears all content from `chatsContainer` and removes the `chats-active` class from `document.body`.
+1.  Upon page load, the script selects various DOM elements.
+2.  The `inputType` change event dynamically shows/hides the YouTube URL or audio file input fields.
+3.  When the `promptForm` is submitted:
+    *   Default form submission is prevented.
+    *   Previous chat content is cleared.
+    *   Input values (`selected` type, `format`, `youtubeURL`, `file`) are extracted and validated.
+    *   A `FormData` object is populated based on the selected input type.
+    *   A "Processing Input..." message is displayed in the chat.
+    *   An asynchronous `POST` request is sent to `BACKEND_URL` (`/summarize`).
+    *   The response is parsed as JSON. If an error is present, it's displayed. Otherwise, the `overall_summary`, `overview`, `keypoints`, and `output_file` are displayed sequentially using `showResultBlock`.
+    *   Network or server errors during the `fetch` operation are caught and displayed.
+4.  Clicking `themeToggleBtn` switches the `body`'s `light-theme` class, updates the button text, and saves the theme preference to `localStorage`.
+5.  Clicking `deleteChatsBtn` clears all messages from the `chatsContainer` and removes the `chats-active` class from the `body`.
 
 ### Dependencies
-*   **Internal**:
-    *   Direct DOM manipulation via `document.querySelector` and `document.createElement`.
-    *   Uses browser's `localStorage` for persisting theme settings.
-    *   Relies on the presence of `frenzy.svg` for avatar images in chat messages.
-*   **External**:
-    *   Requires a backend API endpoint at `http://127.0.0.1:5000/summarize` to process summarization requests. This backend is expected to return JSON data containing `overall_summary`, `overview`, `keypoints`, and `output_file` on success, or an `error` field on failure.
+*   **Internal:**
+    *   The HTML structure (for `chatsContainer`, `promptForm`, input elements, buttons) that this script interacts with via DOM queries.
+    *   `frenzy.svg` for the avatar image displayed in chat messages.
+    *   Associated CSS styles for visual presentation, including `message`, `bot-message`, `light-theme`, and `chats-active` classes.
+*   **External:**
+    *   A backend service accessible at `http://127.0.0.1:5000/summarize` for performing the actual summarization.
+    *   The `fetch` API for making HTTP requests to the backend.
+    *   The `localStorage` API for persisting user theme preferences.
 
 ### Design Notes
-*   The UI updates rely on direct manipulation of the DOM (`innerHTML`, `classList`, `style.display`).
-*   Asynchronous operations for backend communication are handled using the `fetch` API with `async/await`.
-*   Error handling for backend responses and network issues is implemented to provide user feedback.
-*   Client-side validation is performed for required input fields before sending requests.
-*   The "mic" input type is present in the `FormData` construction but lacks corresponding UI elements or specific logic for acquiring microphone input.
+The implementation uses direct DOM manipulation to update the user interface, which is suitable for this level of application complexity. Client-side input validation is performed before sending requests to the backend, reducing unnecessary server load. The asynchronous `fetch` API ensures the UI remains responsive during backend processing. The `mic` input type is referenced in the form data append logic, though its corresponding UI input field is not directly visible or toggled by the existing `inputType` change listener, suggesting it might be a future or incomplete feature.
 
-### Diagram (Optional)
+### Diagram
 ```mermaid
 graph TD
-A[User Submits Form] --> B[Validate Input];
-B --> C[Prepare Data and UI];
-C --> D[Send Request to Backend];
-D --> E[Receive Response];
-E --> F[Display Results or Error];
+A[BrowserClient] --> B[PromptFormSubmit]
+B --> C{ValidateInput}
+C -- Valid --> D[CreateFormData]
+D --> E[SendFetchRequest]
+E --> F[BackendSummarizeAPI]
+F --> G[ReceiveResponse]
+G --> H{HandleResponse}
+H -- Error --> I[DisplayError]
+H -- Success --> J[DisplaySummaryResults]
+I --> A
+J --> A
 ```
