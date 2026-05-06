@@ -7,57 +7,63 @@
 # server.py
 
 ### Overview
-This file implements a Flask web server that exposes a `/summarize` API endpoint. Its primary purpose is to receive summarization requests, handle different input sources (file upload, YouTube URL, microphone input), and delegate the core processing to an external module.
+This file implements a Flask web server that exposes an API endpoint for processing and summarizing various input types. It acts as the backend service responsible for receiving client requests, orchestrating data input, and returning processed results.
 
 ### Architecture & Role
-This file acts as the API layer and the entry point for client requests in a client-server architecture. It sits at the application's edge, receiving HTTP requests and orchestrating the necessary steps to fulfill summarization tasks, effectively serving as a thin wrapper around the core summarization logic.
+This file functions as the API layer within the system's backend. It is responsible for handling incoming HTTP requests, routing them to the appropriate processing logic, and managing server-side interactions like file uploads. It operates at the presentation layer for the core summarization functionality.
 
 ### Key Components
-*   **`app = Flask(__name__)`**: The main Flask application instance, serving as the web server.
-*   **`CORS(app)`**: Enables Cross-Origin Resource Sharing for the Flask application, allowing requests from different origins.
-*   **`UPLOAD_FOLDER`**: A string constant defining the directory for temporary file uploads.
-*   **`summarize()`**: The Flask route handler function for the `/summarize` POST endpoint, responsible for processing incoming summarization requests.
-*   **`process_input`**: An imported function from `lecture4` that encapsulates the core summarization logic for various input types.
+*   **`app = Flask(__name__)`**: The main Flask application instance, serving as the entry point for web requests.
+*   **`CORS(app)`**: Configures Cross-Origin Resource Sharing for the Flask application, allowing requests from different domains.
+*   **`UPLOAD_FOLDER = "uploads"`**: Defines the directory for temporary storage of uploaded files.
+*   **`/summarize` endpoint**: A POST route that serves as the primary API for initiating summarization tasks.
+*   **`summarize()` function**: The handler for the `/summarize` endpoint, parsing request parameters and invoking the core processing logic.
+*   **`process_input` (from `lecture4`)**: An external function responsible for the actual summarization based on source type and format.
 
 ### Execution Flow / Behavior
-When a POST request is made to `/summarize`:
-1.  The `summarize` function extracts `input_type`, `export_format`, `youtube_url`, and `duration` from the request form data.
-2.  It conditionally processes the request based on `input_type`:
-    *   If `input_type` is "file", it saves the uploaded file securely to `UPLOAD_FOLDER`, calls `process_input` with the file path, and then deletes the temporary file.
-    *   If `input_type` is "youtube", it calls `process_input` with the provided YouTube URL.
-    *   If `input_type` is "mic", it calls `process_input` with the specified duration.
-    *   If `input_type` is invalid, it returns a 400 error.
-3.  The result from `process_input` is checked for errors. If an error is present, a 500 status code is returned.
-4.  Otherwise, the result is returned as a JSON response with a 200 status code.
-5.  A global exception handler catches any other errors during processing and returns a 500 status code with an error message.
-6.  When executed as the main script, the Flask application runs in debug mode.
+1.  The Flask application `app` is initialized and CORS is enabled.
+2.  A directory named `uploads` is created if it doesn't already exist, to store temporary files.
+3.  When a `POST` request is received at the `/summarize` endpoint:
+    *   The `summarize` function extracts `input_type`, `export_format`, `youtube_url`, and `duration` from the request form data.
+    *   Based on `input_type`:
+        *   **`file`**: An uploaded file is securely saved to `UPLOAD_FOLDER`, `process_input` is called with the file path, and the file is subsequently removed.
+        *   **`youtube`**: `process_input` is called with the provided `youtube_url`.
+        *   **`mic`**: `process_input` is called with the specified `duration`.
+        *   **Invalid**: Returns a 400 error.
+    *   If `process_input` returns an error, a 500 status code is returned with the error message.
+    *   Otherwise, the result from `process_input` is returned as a JSON response.
+4.  Global exception handling catches unexpected errors during request processing, returning a 500 error.
+5.  The application runs in debug mode if executed directly.
 
 ### Dependencies
-*   **`flask`**: Provides the web framework for building the API server.
-*   **`flask_cors.CORS`**: Enables cross-origin requests, necessary for client-side applications hosted on different domains.
-*   **`lecture4.process_input`**: An internal dependency that contains the business logic for processing and summarizing different input types. This separation ensures the server file remains focused on API handling.
-*   **`os`**: Used for operating system interactions, specifically creating the `uploads` directory and deleting temporary files.
-*   **`werkzeug.utils.secure_filename`**: Utilized to sanitize filenames provided by clients, preventing directory traversal vulnerabilities.
+*   **`flask`**: Provides the web framework functionalities, including request handling, routing, and JSON responses.
+*   **`flask_cors`**: Integrates CORS support, essential for client-side applications interacting with the API.
+*   **`lecture4`**: Contains the core business logic (`process_input`) for summarization. This is a critical internal dependency.
+*   **`os`**: Used for interacting with the file system, specifically for creating the upload directory and managing temporary files.
+*   **`werkzeug.utils.secure_filename`**: Utilized to sanitize filenames provided by users, preventing directory traversal vulnerabilities.
 
 ### Design Notes
-The server employs a clear separation of concerns, with `server.py` handling HTTP requests and `lecture4.process_input` managing the core summarization logic. This enhances maintainability and testability. Temporary file uploads are handled by saving files to a dedicated `uploads` directory and immediately deleting them after processing, which is crucial for resource management and security. Error handling is centralized within the `summarize` endpoint, returning standardized JSON error responses.
+The server provides a unified API endpoint `/summarize` to handle multiple input sources, simplifying client interaction. The use of a temporary `UPLOAD_FOLDER` and immediate file deletion for file-based inputs is crucial for resource management and security. Error handling is implemented at both the `process_input` result level and globally for unexpected exceptions. Running in debug mode by default is suitable for development but should be disabled for production environments.
 
 ### Diagram
 ```mermaid
 graph TD
-ClientRequest[Client POST /summarize] --> FlaskApp[Flask Application]
-FlaskApp --> RequestParsing[Parse Request Form Data]
-RequestParsing --> InputTypeCheck{Input Type?}
-InputTypeCheck -- file --> FileUpload[Save File to UPLOAD_FOLDER]
-FileUpload --> CallProcessInputFile[Call process_inputfile_path]
-InputTypeCheck -- youtube --> CallProcessInputYouTube[Call process_inputyoutube_url]
-InputTypeCheck -- mic --> CallProcessInputMic[Call process_inputduration]
-CallProcessInputFile --> SummarizationLogic[lecture4.process_input]
-CallProcessInputYouTube --> SummarizationLogic
-CallProcessInputMic --> SummarizationLogic
-SummarizationLogic --> Result[Summarization Result]
-Result --> DeleteTempFile[Delete Temporary File if file input]
-DeleteTempFile --> SendResponse[Return JSON Response]
-InputTypeCheck -- invalid --> InvalidInputError[Return 400 Invalid Input]
-SummarizationLogic -- error --> ServerError[Return 500 Server Error]
+ClientRequest[ClientRequest] --> ServerPython[server.py]
+ServerPython --> SummarizeEndpoint[POST /summarize]
+SummarizeEndpoint --> ParseRequest[ParseRequestParameters]
+ParseRequest --> InputTypeBranch{InputType?}
+
+InputTypeBranch --> |file| SaveFile[SaveUploadedFile]
+SaveFile --> CallProcessInputFile[Call process_input file_path]
+CallProcessInputFile --> DeleteFile[DeleteTemporaryFile]
+
+InputTypeBranch --> |youtube| CallProcessInputYouTube[Call process_input youtube_url]
+InputTypeBranch --> |mic| CallProcessInputMic[Call process_input duration]
+
+CallProcessInputFile --> SummarizationResult[SummarizationResult]
+CallProcessInputYouTube --> SummarizationResult
+CallProcessInputMic --> SummarizationResult
+
+SummarizationResult --> JSONResponse[Return JSON Response]
+JSONResponse --> ClientRequest
 ```
