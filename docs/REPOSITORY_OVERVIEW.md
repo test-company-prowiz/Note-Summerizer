@@ -1,40 +1,35 @@
 # Note-Summerizer — Repository Overview
 
 ### High-Level Purpose
-The repository implements a service for generating summaries from diverse input sources, including uploaded files, YouTube URLs, and microphone audio. Its primary objective is to provide an API endpoint that orchestrates input processing and summarization.
+The repository appears to implement a web-based application focused on interactive content summarization or conversational AI, featuring a dynamic user interface for suggestions, chat interactions, and user input.
 
 ### Architectural Structure
-The system follows a client-server architecture. `server.py` establishes the backend API layer, acting as an entry point for client requests. It delegates core business logic, such as input processing and summarization, to an internal module (`lecture4`). The application uses a designated `UPLOAD_FOLDER` for temporary file storage, indicating interaction with the local file system.
+The project follows a client-side web application architecture. The provided `style.css` indicates a clear separation of concerns for presentation logic. It implies an underlying HTML structure for content and a JavaScript layer for dynamic behavior, theme management, and UI state changes.
 
 ### Core Components
--   **API Server (`server.py`)**: A Flask-based web server responsible for exposing the `/summarize` API endpoint, handling HTTP requests, managing file uploads, and orchestrating calls to the core summarization logic.
--   **Summarization Logic (`lecture4.process_input`)**: An internal module that encapsulates the business logic for processing different input types (file content, YouTube audio, microphone audio) and generating summaries.
+Based on the styling definitions, the core UI components include:
+*   **Application Header**: Displays the main title and subheading.
+*   **Suggestion System**: Presents interactive suggestion cards to the user.
+*   **Chat Interface**: Manages and displays conversational exchanges between a user and a bot, including avatars and message formatting.
+*   **User Prompt**: Provides an input area for users to submit queries or notes, equipped with action buttons.
+*   **Theming System**: Supports dynamic switching between dark and light themes using CSS variables.
+*   **Responsive Layout**: Adapts the UI for various screen sizes, particularly mobile.
+*   **Background Video**: A full-screen video element for aesthetic purposes.
 
 ### Interaction & Data Flow
-1.  A client initiates a POST request to the `/summarize` endpoint, specifying an `input_type` (file, youtube, mic) and relevant data.
-2.  The API server (`server.py`) receives the request.
-3.  If `input_type` is "file", the server saves the uploaded file temporarily.
-4.  The server then invokes the `process_input` function from the `lecture4` module, passing the appropriate input (file path, YouTube URL, or duration).
-5.  The `process_input` function performs the summarization.
-6.  The summarization result is returned to the server.
-7.  The server constructs a JSON response, handling any errors, and sends it back to the client.
-8.  Temporary files are cleaned up after processing.
+The user interface is designed for interactive engagement. Users provide input via a prompt field, potentially selecting from predefined suggestions. The application dynamically adjusts its visual state (e.g., theme, visibility of UI elements, loading animations) in response to user actions or system states, managed by JavaScript manipulating CSS classes on the `body` element.
 
 ### Technology Stack
--   **Web Framework**: Flask
--   **CORS**: Flask-CORS
--   **File Handling**: `os` module, `werkzeug.utils.secure_filename`
+*   **Frontend**: HTML (implied), CSS (explicitly defined in `style.css`), JavaScript (implied for dynamic UI control).
+*   **Styling**: Utilizes CSS custom properties for theming and media queries for responsiveness.
+*   **External Assets**: Integrates Google Fonts for typography.
 
 ### Design Observations
-The system centralizes various summarization input types under a single API endpoint, leveraging a parameter to differentiate processing paths. This simplifies the API surface for clients. Temporary file handling is explicitly managed, ensuring cleanup. Global CORS enablement facilitates frontend integration, though a production environment might require more restrictive policies. Error handling is implemented to provide informative responses with appropriate HTTP status codes.
+The design emphasizes a modern, responsive user experience with:
+*   **Theming**: Robust theme management via CSS custom properties allows for easy customization and user preference adaptation.
+*   **Responsiveness**: Media queries ensure the application is usable and visually consistent across desktop and mobile devices.
+*   **Dynamic UI**: The reliance on JavaScript to toggle CSS classes for state changes (e.g., `light-theme`, `chats-active`, `bot-responding`) indicates a dynamic and interactive user interface.
+*   **Visual Engagement**: The inclusion of a background video and custom scrollbar styling suggests attention to visual aesthetics.
 
 ### System Diagram
-```mermaid
-graph TD
-Client --> APIServer[APIServerFlask]
-APIServer --> SummarizationLogic[SummarizationLogic]
-APIServer --> TemporaryFileStorage[TemporaryFileStorage]
-TemporaryFileStorage --> APIServer
-SummarizationLogic --> APIServer
-APIServer --> Client
-```
+None significant.
