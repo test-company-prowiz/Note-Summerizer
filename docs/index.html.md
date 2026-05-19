@@ -7,58 +7,52 @@
 # index.html
 
 ### Overview
-This file serves as the main entry point for the Lecture Summarizer web application, defining its user interface structure. It presents the core layout, static content, and interactive form elements for user input and actions within the system.
+This file serves as the primary entry point and user interface for the AI-Powered Lecture Summarizer application. It establishes the foundational HTML structure, incorporates styling, and integrates client-side scripting to manage user interactions and display dynamic content.
 
 ### Architecture & Role
-Architecturally, `index.html` resides at the client-side presentation layer. It is the root HTML document loaded by the web browser, providing the initial document object model (DOM) upon which CSS styling and JavaScript interactivity are built.
+This file operates at the presentation layer, serving as the client-side interface for the application. It is directly rendered by a web browser, forming the visual and interactive foundation upon which the application's functionality is built. It does not contain server-side logic.
 
 ### Key Components
-*   **`app-header`**: Displays the application title and a brief description of its capabilities.
-*   **`suggestions`**: A list detailing the primary modes of operation (Mic, File upload, YouTube link) and output options (PDF, Word, JSON).
-*   **`chats-container`**: An empty `div` element intended as a dynamic area for displaying chat-like interactions or summary outputs, populated by JavaScript.
-*   **`prompt-container`**: Encapsulates the user input form, including:
-    *   `input-type` dropdown: Allows selection of input source (Mic, File, YouTube).
-    *   `youtube-link` input: Text field for YouTube URLs, conditionally displayed.
-    *   `audio-file` input: File picker for audio/video uploads, conditionally displayed.
-    *   `export-format` dropdown: Specifies the desired summary output format.
-    *   `process-btn`: Initiates the summarization process.
-*   **`theme-toggle-btn`**: A button to switch between UI themes.
-*   **`delete-chats-btn`**: A button to clear existing chat/summary content.
-*   **`video-container`**: Contains a background video element for visual ambiance.
+*   **`video-container`**: A `div` element containing an autoplaying, muted, looping background video (`videos/desktop-video.mp4`).
+*   **`app-header`**: Displays the main title ("AI-Powered Lecture Summarizer") and a sub-heading.
+*   **`suggestions`**: An unordered list (`ul`) presenting potential input methods and features (mic, file upload, YouTube link, export).
+*   **`chats-container`**: An empty `div` intended to display chat-like interactions or summary outputs, managed by client-side JavaScript.
+*   **`prompt-container`**: Encapsulates user input controls.
+    *   **`prompt-form`**: Contains `select` elements for input source (`mic`, `file`, `youtube`) and export format (`pdf`, `word`, `json`).
+    *   **`youtube-link`**: An `input` field for YouTube URLs, initially hidden.
+    *   **`audio-file`**: An `input` field for file uploads (audio/video), initially hidden.
+    *   **`process-btn`**: A button to trigger the summarization process.
+*   **`theme-toggle-btn`**: A button to switch between themes.
+*   **`delete-chats-btn`**: A button to clear chat history or summaries.
+*   **`disclaimer-text`**: Paragraphs providing information about the demo's capabilities and copyright.
 
 ### Execution Flow / Behavior
-Upon browser load, the HTML document is parsed and rendered, displaying the initial UI elements.
-1.  The background video `videos/desktop-video.mp4` begins autoplaying.
-2.  The Google Material Symbols font and `style.css` are loaded to apply visual styles and icons.
-3.  Static header and feature suggestions are presented.
-4.  The input form elements are available for user interaction.
-5.  `script.js` is loaded last, providing dynamic functionality such as toggling input fields based on `input-type` selection, handling form submissions, managing themes, and clearing chats.
+Upon browser load, `index.html` is parsed and rendered.
+1.  The `head` section loads metadata, the page title, Google Material Symbols Rounded font, and `style.css`.
+2.  The `body` renders the background video, the main header, feature suggestions, and the interactive prompt area.
+3.  Initially, the YouTube link input and file upload input fields are hidden.
+4.  The `script.js` file is loaded and executed, which is responsible for adding dynamic behavior, such as toggling input field visibility based on the selected input source, handling form submissions, managing theme changes, and clearing chats.
+5.  User interactions with the form elements and buttons are processed by the associated JavaScript.
 
 ### Dependencies
-*   **Internal**:
-    *   `style.css`: Provides all custom styling for the page layout and components.
-    *   `script.js`: Implements the interactive logic for the UI elements, form handling, and potentially communication with backend services or client-side AI.
-    *   `videos/desktop-video.mp4`: The background video asset.
-*   **External**:
-    *   `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded`: Google Fonts stylesheet for "Material Symbols Rounded" icons, used throughout the UI.
+*   **`style.css`**: External stylesheet defining the visual presentation of the UI.
+*   **`script.js`**: External JavaScript file providing interactive functionality and client-side logic.
+*   **`https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@32,400,0,0`**: Google Fonts API for loading Material Symbols Rounded icons.
+*   **`videos/desktop-video.mp4`**: A local video file used as a background element.
 
 ### Design Notes
-The UI design is responsive and component-based, utilizing semantic HTML5 elements. Conditional display of input fields (YouTube URL, file input) indicates a JavaScript-driven interaction model. The presence of a `chats-container` suggests an asynchronous, possibly conversational, interaction flow where summaries or intermediate messages are displayed dynamically. The disclaimer highlights the demo nature and client-side processing, implying an initial focus on frontend interactivity with limited integrated AI logic within this specific version.
+*   The use of `<meta name="viewport">` ensures responsiveness across different devices.
+*   The `playsinline` attribute on the video element is crucial for autoplaying videos on iOS devices.
+*   The input fields for YouTube URL and file upload are initially hidden, implying dynamic visibility control via JavaScript based on the selected input type.
+*   The `chats-container` is an empty `div`, indicating that its content will be dynamically generated and managed by `script.js`.
+*   The explicit disclaimers clarify that this is a browser-based demo with limited AI logic, managing user expectations.
 
 ### Diagram
 ```mermaid
 graph TD
-BrowserLoad[Browser Load] --> IndexHTML[index.html]
+BrowserRequest[Browser Request] --> IndexHTML[index.html]
 IndexHTML --> StyleCSS[style.css]
 IndexHTML --> ScriptJS[script.js]
+IndexHTML --> GoogleFonts[Google Fonts API]
 IndexHTML --> DesktopVideo[videos/desktop-video.mp4]
-IndexHTML --> GoogleFonts[MaterialSymbolsRounded]
-
-ScriptJS --> HandleInputSelection[Handle Input Type Selection]
-ScriptJS --> HandleFormSubmit[Handle Form Submission]
-ScriptJS --> HandleThemeToggle[Handle Theme Toggle]
-ScriptJS --> HandleDeleteChats[Handle Delete Chats]
-
-HandleInputSelection --> ShowHideInputs[Show/Hide YouTube/File Inputs]
-HandleFormSubmit --> ProcessSummarization[Trigger Summarization Logic]
 ```
