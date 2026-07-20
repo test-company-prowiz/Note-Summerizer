@@ -7,74 +7,77 @@
 # script.js
 
 ### Overview
-This file implements the client-side logic for a web application designed to summarize content from various sources (YouTube links, audio files, or microphone input). It manages user interface interactions, handles form submissions, communicates with a backend summarization service, and displays the results in a chat-like format.
+This file implements the client-side JavaScript logic for a web application that facilitates content summarization. It manages user interface interactions, handles form submissions for various input types (YouTube URL, audio file), and communicates with a backend API to retrieve and display summaries.
 
 ### Architecture & Role
-This file operates within the presentation layer, specifically as a client-side JavaScript module. Its role is to bridge user interactions with the backend API, acting as the primary controller for the user interface and data flow from the browser to the summarization service. It does not contain server-side logic or persistent data storage mechanisms beyond local theme preferences.
+`script.js` operates within the client-side (browser) layer of the application. It acts as the primary controller for the user interface, responsible for:
+*   Responding to user input.
+*   Dynamically updating the DOM.
+*   Orchestrating API requests to the backend summarization service.
 
 ### Key Components
-*   **DOM Element Selectors**: Variables like `chatsContainer`, `promptForm`, `inputType`, `youtubeInput`, `fileInput`, `themeToggleBtn`, and `deleteChatsBtn` reference specific HTML elements for manipulation and event handling.
-*   **`BACKEND_URL`**: A constant defining the endpoint for the backend summarization service (`http://127.0.0.1:5000/summarize`).
-*   **`showResultBlock(title, content, type)`**: A utility function responsible for dynamically creating and appending message blocks to the `chatsContainer`, displaying user input, processing messages, or summary results.
-*   **Event Listeners**:
-    *   `inputType.addEventListener("change", ...)`: Controls the visibility of input fields (YouTube URL or file upload) based on the selected input type.
-    *   `promptForm.addEventListener("submit", async (e) => ...)`: Handles the form submission, including input validation, `FormData` creation, API request to the backend, and rendering of responses or errors.
-    *   `themeToggleBtn.addEventListener("click", ...)`: Toggles the `light-theme` class on the `<body>` element and stores the theme preference in `localStorage`.
-    *   `deleteChatsBtn.addEventListener("click", ...)`: Clears all displayed messages from the `chatsContainer`.
+*   **DOM Element Selectors**: Variables like `chatsContainer`, `promptForm`, `inputType`, `youtubeInput`, `fileInput`, `themeToggleBtn`, and `deleteChatsBtn` are used to reference specific HTML elements for manipulation and event handling.
+*   **`BACKEND_URL` Constant**: Defines the endpoint for the summarization service API.
+*   **`showResultBlock(title, content, type)` Function**: A utility function to create and append styled message blocks (e.g., user prompts, bot responses, errors) to the `chatsContainer`.
+*   **`inputType` Change Listener**: Toggles the visibility of either the YouTube URL input or the audio file input based on the user's selection.
+*   **`promptForm` Submission Listener**: Handles the core logic for submitting summarization requests to the backend, including input validation, `FormData` construction, API `fetch` call, and rendering results or errors.
+*   **`themeToggleBtn` Click Listener**: Manages the application's theme (light/dark mode) by toggling a CSS class on the `body` element and persisting the preference in `localStorage`.
+*   **`deleteChatsBtn` Click Listener**: Clears all displayed chat messages from the `chatsContainer`.
 
 ### Execution Flow / Behavior
-1.  **Initialization**: The script selects necessary DOM elements upon loading.
-2.  **Input Type Selection**: When the user changes the `inputType` dropdown, the script dynamically shows or hides the `youtubeInput` or `fileInput` fields.
+1.  **Initialization**: Upon page load, the script selects necessary DOM elements and defines the backend API URL.
+2.  **Input Type Selection**: When the user changes the `inputType` dropdown, the script dynamically shows either the YouTube URL field or the audio file upload field, hiding the other.
 3.  **Form Submission**:
-    *   Upon `promptForm` submission, default form behavior is prevented.
-    *   The `chatsContainer` is cleared.
-    *   Input type, export format, and relevant input data (YouTube URL or file) are retrieved and validated.
-    *   A `FormData` object is constructed with the selected options and data.
-    *   A "Processing Input..." message is displayed using `showResultBlock`.
+    *   On `promptForm` submission, default form behavior is prevented.
+    *   Previous chat messages are cleared.
+    *   Input fields (e.g., YouTube URL, file upload) are validated based on the selected input type.
+    *   A `FormData` object is constructed, including `input_type`, `export_format`, and the relevant input data (YouTube URL, audio file, or a placeholder for "mic" input).
+    *   A "Processing Input" message is displayed in the chat area.
     *   An asynchronous `POST` request is sent to the `BACKEND_URL` with the `FormData`.
-    *   The response from the backend is parsed as JSON.
+    *   Upon receiving a response, the processing message is cleared.
     *   If the response contains an `error` field, an error message is displayed.
-    *   Otherwise, summary details (`overall_summary`, `overview`, `keypoints`, `output_file`) are displayed using `showResultBlock`.
-    *   Error handling for network issues or failed backend connections is implemented via a `try-catch` block.
-4.  **Theme Toggling**: Clicking `themeToggleBtn` switches between `light-theme` and default (dark) theme, updating the button text and `localStorage`.
-5.  **Chat Deletion**: Clicking `deleteChatsBtn` clears all messages from the `chatsContainer` and removes the `chats-active` class from the `<body>`.
+    *   Otherwise, the overall summary, overview, key points, and export file information are displayed in separate chat blocks.
+    *   Error handling for network issues or server failures is included.
+4.  **Theme Toggling**: Clicking the `themeToggleBtn` switches the `body` element's class between `light-theme` and no class, updates the button text, and saves the theme preference to `localStorage`.
+5.  **Chat Deletion**: Clicking the `deleteChatsBtn` empties the `chatsContainer` and removes the `chats-active` class from the `body`.
 
 ### Dependencies
-*   **Internal**:
-    *   **HTML Structure**: Relies on specific DOM elements with classes (`.chats-container`, `.prompt-form`, `.message`, etc.) and IDs (`#input-type`, `#export-format`, `#youtube-link`, `#audio-file`, `#theme-toggle-btn`, `#delete-chats-btn`) to function correctly.
-    *   **CSS Styles**: Assumes the presence of CSS rules for classes like `.message`, `.bot-message`, `.user-message`, `.chats-active`, and `.light-theme` to manage visual presentation.
-*   **External**:
-    *   **Backend API**: Requires a running backend service at `http://127.0.0.1:5000/summarize` that accepts `POST` requests with `FormData` and returns a JSON object containing summary data or an error message.
+*   **Web APIs**:
+    *   `document.querySelector()`: For DOM element selection.
+    *   `HTMLElement.addEventListener()`: For event handling.
+    *   `fetch()`: For making HTTP requests to the backend.
+    *   `FormData()`: For constructing multipart/form-data requests.
+    *   `localStorage`: For client-side persistence of user preferences (theme).
+    *   `setTimeout()`: For deferred scrolling behavior.
+*   **Backend API**: Relies on an external backend service available at `http://127.0.0.1:5000/summarize` to process summarization requests.
 
 ### Design Notes
-*   **Direct DOM Manipulation**: The script directly queries and manipulates the DOM for rendering and event handling. For larger applications, a framework-based approach might offer better maintainability.
-*   **Client-Side Validation**: Basic input validation (presence of URL/file) is performed client-side, enhancing user experience by providing immediate feedback.
-*   **Backend Coupling**: The `BACKEND_URL` is hardcoded, coupling the frontend directly to a specific local backend instance.
-*   **Theme Persistence**: Theme preference is stored in `localStorage`, allowing the user's selection to persist across sessions.
+*   **Direct DOM Manipulation**: The script directly manipulates the DOM to update the UI, which is common for smaller client-side applications but can become complex in larger projects without a framework.
+*   **Client-Side Validation**: Basic input validation is performed on the client side before submitting requests, improving user experience by providing immediate feedback.
+*   **Single Backend Endpoint**: All summarization requests are directed to a single `/summarize` endpoint, with the `input_type` parameter differentiating the request type.
+*   **State Management**: UI state (like `chats-active` class and theme preference) is managed directly via DOM classes and `localStorage`.
 
 ### Diagram
 ```mermaid
 graph TD
-User[UserInteraction] --> SelectInput[SelectInputType]
-User --> EnterPrompt[EnterPromptDetails]
-SelectInput --> ToggleInputVisibility[ToggleInputVisibility]
-EnterPrompt --> PromptForm[PromptFormSubmit]
-PromptForm --> ValidateInput[ValidateInput]
-ValidateInput -- Valid --> BuildFormData[BuildFormData]
-BuildFormData --> ShowProcessing[ShowProcessingMessage]
-ShowProcessing --> FetchBackend[FetchBackendAPI]
-FetchBackend --> BackendService[BackendService]
-BackendService --> Response[APIResponse]
-Response --> ParseResponse[ParseJSONResponse]
-ParseResponse --> HandleError[HandleError]
-ParseResponse --> DisplaySummary[DisplaySummaryResults]
-HandleError --> ShowError[ShowErrorMessage]
-DisplaySummary --> UpdateUI[UpdateChatsContainer]
-UpdateUI --> ScrollView[ScrollIntoView]
+A[UserInteraction] --> B[PromptFormSubmit]
+A --> C[InputTypeChange]
+A --> D[ThemeToggleClick]
+A --> E[DeleteChatsClick]
 
-User --> ThemeToggleBtn[ThemeToggleButtonClick]
-ThemeToggleBtn --> ToggleTheme[ToggleThemeClassAndLocalStorage]
+C --> F[ToggleInputVisibility]
 
-User --> DeleteChatsBtn[DeleteChatsButtonClick]
-DeleteChatsBtn --> ClearChats[ClearChatsContainer]
+B --> G[ClearChats]
+B --> H[ValidateInput]
+B --> I[ConstructFormData]
+B --> J[ShowProcessingMessage]
+B --> K[FetchBackendAPI]
+K --> L{APIResponse}
+L --> M[DisplaySummaryResults]
+L --> N[DisplayError]
+
+D --> O[ToggleThemeClass]
+D --> P[UpdateLocalStorage]
+
+E --> Q[ClearChatsContainer]
 ```
