@@ -7,52 +7,48 @@
 # index.html
 
 ### Overview
-This file serves as the primary entry point and user interface for the AI-Powered Lecture Summarizer application. It establishes the foundational HTML structure, incorporates styling, and integrates client-side scripting to manage user interactions and display dynamic content.
+This file serves as the main entry point and user interface for the AI-Powered Lecture Summarizer application. It defines the structural layout and presents interactive elements for users to input lecture sources (microphone, file upload, YouTube link) and select export formats for summaries.
 
 ### Architecture & Role
-This file operates at the presentation layer, serving as the client-side interface for the application. It is directly rendered by a web browser, forming the visual and interactive foundation upon which the application's functionality is built. It does not contain server-side logic.
+Architecturally, `index.html` functions as the presentation layer (view) of a client-side web application. It is a static HTML document served directly to the browser, which then relies on linked stylesheets for visual presentation and a JavaScript file for dynamic behavior and application logic.
 
 ### Key Components
-*   **`video-container`**: A `div` element containing an autoplaying, muted, looping background video (`videos/desktop-video.mp4`).
-*   **`app-header`**: Displays the main title ("AI-Powered Lecture Summarizer") and a sub-heading.
-*   **`suggestions`**: An unordered list (`ul`) presenting potential input methods and features (mic, file upload, YouTube link, export).
-*   **`chats-container`**: An empty `div` intended to display chat-like interactions or summary outputs, managed by client-side JavaScript.
-*   **`prompt-container`**: Encapsulates user input controls.
-    *   **`prompt-form`**: Contains `select` elements for input source (`mic`, `file`, `youtube`) and export format (`pdf`, `word`, `json`).
-    *   **`youtube-link`**: An `input` field for YouTube URLs, initially hidden.
-    *   **`audio-file`**: An `input` field for file uploads (audio/video), initially hidden.
-    *   **`process-btn`**: A button to trigger the summarization process.
-*   **`theme-toggle-btn`**: A button to switch between themes.
-*   **`delete-chats-btn`**: A button to clear chat history or summaries.
-*   **`disclaimer-text`**: Paragraphs providing information about the demo's capabilities and copyright.
+*   **HTML5 Doctype and Metadata**: Standard `<!DOCTYPE html>` declaration and essential meta tags for character set, viewport, and application title.
+*   **External Stylesheets**: Links to `style.css` for application-specific styling and Google Fonts for `Material Symbols Rounded` icons.
+*   **Video Background**: A `<video>` element (`videos/desktop-video.mp4`) configured for autoplay, mute, loop, and inline playback, serving as a background visual element.
+*   **Application Header**: Contains the main title (`AI-Powered Lecture Summarizer`) and a subtitle describing its capabilities.
+*   **Feature Suggestions**: A `<ul>` list outlining the primary features: real-time mic summary, file upload, YouTube link processing, and summary export.
+*   **Chats Container**: An empty `<div>` (`.chats-container`) intended to dynamically display summary outputs or chat interactions.
+*   **Prompt Container**: Encapsulates user interaction elements:
+    *   **Input Form**: A `<form>` containing controls for selecting input sources (`mic`, `file`, `youtube`), providing input (YouTube URL, audio/video file), and choosing export formats (`pdf`, `word`, `json`).
+    *   **Action Buttons**: `process-btn` to initiate summarization, `theme-toggle-btn` for UI theme switching, and `delete-chats-btn` for clearing summaries.
+*   **Disclaimer Text**: Informational text regarding the demo's in-browser functionality and limited AI logic.
+*   **JavaScript Inclusion**: A `<script>` tag referencing `script.js` at the end of the `<body>` for client-side scripting.
 
 ### Execution Flow / Behavior
-Upon browser load, `index.html` is parsed and rendered.
-1.  The `head` section loads metadata, the page title, Google Material Symbols Rounded font, and `style.css`.
-2.  The `body` renders the background video, the main header, feature suggestions, and the interactive prompt area.
-3.  Initially, the YouTube link input and file upload input fields are hidden.
-4.  The `script.js` file is loaded and executed, which is responsible for adding dynamic behavior, such as toggling input field visibility based on the selected input source, handling form submissions, managing theme changes, and clearing chats.
-5.  User interactions with the form elements and buttons are processed by the associated JavaScript.
+Upon a browser request, the web server delivers `index.html`. The browser then:
+1.  Parses the HTML structure and renders the initial static content.
+2.  Fetches and applies `style.css` and the Google Fonts stylesheet for visual styling and icons.
+3.  Loads and plays the `videos/desktop-video.mp4` in the background.
+4.  Displays the header, feature suggestions, and the interactive prompt form. The YouTube link and file upload inputs are initially hidden via `style="display:none;"`, implying their visibility is managed by JavaScript.
+5.  Executes `script.js` after the DOM is loaded, enabling dynamic functionality such as handling user input selections, processing requests, managing UI state (e.g., theme toggle, chat deletion), and potentially interacting with a summarization engine.
 
 ### Dependencies
-*   **`style.css`**: External stylesheet defining the visual presentation of the UI.
-*   **`script.js`**: External JavaScript file providing interactive functionality and client-side logic.
-*   **`https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@32,400,0,0`**: Google Fonts API for loading Material Symbols Rounded icons.
-*   **`videos/desktop-video.mp4`**: A local video file used as a background element.
+*   **Internal Stylesheet**: `style.css` (for application layout and styling).
+*   **External Stylesheet**: `https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@32,400,0,0` (for Google Material Symbols icons).
+*   **Video Asset**: `videos/desktop-video.mp4` (for the background video).
+*   **Client-Side Script**: `script.js` (for all interactive logic and dynamic content updates).
 
 ### Design Notes
-*   The use of `<meta name="viewport">` ensures responsiveness across different devices.
-*   The `playsinline` attribute on the video element is crucial for autoplaying videos on iOS devices.
-*   The input fields for YouTube URL and file upload are initially hidden, implying dynamic visibility control via JavaScript based on the selected input type.
-*   The `chats-container` is an empty `div`, indicating that its content will be dynamically generated and managed by `script.js`.
-*   The explicit disclaimers clarify that this is a browser-based demo with limited AI logic, managing user expectations.
+The design follows a single-page application (SPA) pattern, where `index.html` provides the static shell, and `script.js` is responsible for all dynamic content and interaction. The use of `display:none` on certain input fields suggests a dynamic UI where input options are revealed based on user selection, improving user experience by reducing clutter. The explicit disclaimer about "fully in-browser with limited AI logic" indicates a client-side processing model or a highly optimized local AI component, potentially with minimal or no backend interaction for summarization in this specific demo context.
 
 ### Diagram
 ```mermaid
 graph TD
-BrowserRequest[Browser Request] --> IndexHTML[index.html]
-IndexHTML --> StyleCSS[style.css]
-IndexHTML --> ScriptJS[script.js]
-IndexHTML --> GoogleFonts[Google Fonts API]
-IndexHTML --> DesktopVideo[videos/desktop-video.mp4]
+ClientBrowser[ClientBrowser] --> RequestIndexHTML[Request index.html]
+RequestIndexHTML --> IndexHTML[index.html]
+IndexHTML --> LoadStyleCSS[Load style.css]
+IndexHTML --> LoadGoogleFonts[Load Google Fonts]
+IndexHTML --> LoadDesktopVideo[Load videos/desktop-video.mp4]
+IndexHTML --> LoadScriptJS[Load script.js]
 ```

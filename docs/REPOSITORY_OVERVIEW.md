@@ -7,44 +7,55 @@
 # Note-Summerizer — Repository Overview
 
 ### High-Level Purpose
-The Note-Summerizer repository provides a web application designed to summarize content from various input sources. Its primary objective is to allow users to submit YouTube links, audio files, or microphone input, process this content, and return a structured summary.
+The Note-Summerizer repository aims to provide an AI-powered application for summarizing lecture content. It processes audio inputs from various sources (microphone, local files, YouTube links), transcribes them, generates concise summaries and key points, and allows users to export the results into multiple document formats.
 
 ### Architectural Structure
-The repository is structured into a client-side frontend and a Python-based backend API.
-*   **Frontend**: Implemented in `script.js`, it handles user interface interactions, input collection, and display of results within the browser.
-*   **Backend**: Implemented in `server.py` using Flask, it exposes a `/summarize` API endpoint to receive requests, manage file uploads, and orchestrate the core summarization logic.
-*   **Core Logic**: A separate module, `lecture4.py` (inferred from `server.py`'s dependency), encapsulates the actual summarization algorithms and processing for different input types.
+The repository demonstrates a two-tier architectural structure:
+*   **Presentation Layer**: Comprises `index.html` and its associated `style.css` and `script.js` files, forming the client-side user interface.
+*   **Processing Layer**: `lecture4.py` represents the backend logic responsible for audio handling, transcription, natural language processing (NLP) for summarization and key point extraction, and document generation.
+
+The `index.html` file serves as the static entry point for the web application, while `lecture4.py` encapsulates the core, resource-intensive processing capabilities, implying a client-server interaction model for a complete deployment.
 
 ### Core Components
-*   **Client-Side Application (`script.js`)**: Manages the web UI, form submissions, dynamic content rendering, and asynchronous communication with the backend.
-*   **Flask API Server (`server.py`)**: Acts as the HTTP interface for the summarization service, handling request routing, input validation, file management, and delegation to the core summarization logic.
-*   **Summarization Module (`lecture4.process_input`)**: Contains the business logic responsible for processing YouTube URLs, audio files, or microphone input to generate summaries.
+*   **User Interface (`index.html`, `script.js`, `style.css`)**: Provides the interactive web interface for users to select input sources, initiate summarization, and choose export formats.
+*   **Audio Input Handler (`lecture4.py`)**: Manages recording from a microphone, processing local audio/video files, and downloading audio from YouTube URLs.
+*   **Transcription Engine (`lecture4.py`)**: Utilizes the Whisper model for converting spoken audio into text.
+*   **Summarization and Key Point Generation (`lecture4.py`)**: Leverages the Hugging Face `transformers` library with the Flan-T5 model to create summaries and extract key points from transcribed text.
+*   **Document Export (`lecture4.py`)**: Supports exporting processed summaries and key points into PDF, Microsoft Word (`.docx`), and JSON formats.
 
 ### Interaction & Data Flow
-1.  A user interacts with the web interface provided by the frontend (`script.js`) in their browser.
-2.  Upon form submission, the frontend collects user input (YouTube URL, audio file, or microphone duration) and sends an asynchronous POST request to the backend's `/summarize` endpoint.
-3.  The backend (`server.py`) receives the request, identifies the input type, and handles any necessary operations (e.g., saving uploaded files temporarily).
-4.  The backend then invokes `process_input` from the `lecture4` module, passing the relevant input (file path, YouTube URL, or duration).
-5.  The `lecture4` module performs the summarization and returns the results to the backend.
-6.  The backend formats these results into a JSON response and sends it back to the frontend.
-7.  The frontend (`script.js`) parses the JSON response and dynamically updates the UI to display the generated summary or any error messages.
+A user interacts with the web interface (`index.html`), selecting an input source (mic, file, YouTube URL) and an export format. User actions on the frontend (presumably handled by `script.js`) would trigger requests to a backend service. This backend service, implemented by `lecture4.py`, would then:
+1.  Acquire audio data based on the user's input choice.
+2.  Transcribe the audio into text.
+3.  Process the text to generate summaries and key points.
+4.  Format the results into the requested export type.
+5.  Return the output (e.g., file path, JSON data) to the frontend for download or display.
+Temporary audio files are created and cleaned up during the backend processing.
 
 ### Technology Stack
-*   **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3. Utilizes standard browser APIs like `fetch` and `localStorage`.
-*   **Backend**: Python 3, Flask web framework, Flask-CORS for cross-origin resource sharing, `werkzeug.utils` for secure file handling.
-*   **Core Logic**: Python (module `lecture4` inferred).
+*   **Frontend**: HTML5, CSS3, JavaScript (implied by `script.js`), Google Fonts.
+*   **Backend/Processing**: Python.
+*   **Speech-to-Text**: OpenAI Whisper (via `whisper` library).
+*   **Natural Language Processing**: Hugging Face `transformers` library (specifically `google/flan-t5-large` for summarization).
+*   **Audio Handling**: `sounddevice`, `scipy.io.wavfile` for microphone recording; `yt_dlp` for YouTube audio download.
+*   **Document Generation**: `fpdf` for PDF, `python-docx` for Word.
+*   **Data Serialization**: `json`.
+*   **File System Operations**: `os`.
 
 ### Design Observations
-The system exhibits a clear separation of concerns between the frontend UI, the backend API, and the core summarization logic. This modularity enhances maintainability. Temporary file handling on the server ensures efficient resource usage for uploaded content. A hardcoded backend URL in the frontend could pose deployment flexibility challenges. Client-side validation is present but requires robust server-side counterparts. The backend's debug mode is suitable for development but requires secure configuration for production deployments.
+The project demonstrates a clear separation of concerns between the user interface and the core processing logic. The `lecture4.py` module is highly modular, breaking down complex tasks like transcription, summarization, and export into distinct functions, which enhances maintainability and reusability. The selection of established NLP models (Whisper, Flan-T5) indicates a focus on leveraging robust, pre-trained solutions for accuracy. The provision of multiple export formats caters to diverse user requirements. The `index.html` disclaimer about "limited AI logic" for the demo suggests that while the `lecture4.py` provides full functionality, the frontend might initially demonstrate a simplified client-side AI integration or act as a placeholder for a full backend connection.
 
 ### System Diagram
-
 ```mermaid
 graph TD
-A[UserBrowser] --> B[FrontendScript]
-B --> C[BackendAPI]
-C --> D[CoreSummarizationLogic]
-D --> C
-C --> B
-B --> A
+A[ClientBrowser] --> B[FrontendUI]
+B[FrontendUI] --> C[BackendProcessing]
+C[BackendProcessing] --> D[WhisperModel]
+C[BackendProcessing] --> E[FlanT5Model]
+C[BackendProcessing] --> F[YTDLP]
+C[BackendProcessing] --> G[OutputFiles]
+D[WhisperModel] --> C
+E[FlanT5Model] --> C
+F[YTDLP] --> C
+G[OutputFiles] --> B
 ```
